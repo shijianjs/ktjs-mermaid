@@ -29,9 +29,9 @@ Kotlin/JS external 声明。
 围绕 wrapper 的工程交付，与上面的 API 覆盖分开计数。
 
 - 总计：11
-- 已完成：10
+- 已完成：11
 - 明确不做：0
-- 待完成：1
+- 待完成：0
 
 ### 清单
 
@@ -47,8 +47,8 @@ Kotlin/JS external 声明。
 8. ✅ 根 `AGENTS.md` 语义化改写（模板的 Vaadin/Web Component 段落替换为 mermaid 约定与踩坑）。
 9. ✅ 两套 README（根 + 模块，含 `zh-CN`）改写；`dependabot.yml` 的 `upstream` 分组改成 `mermaid`。
 10. ✅ GitHub Pages 源切到 GitHub Actions（`gh api`），`pages.yml` 手动触发。
-11. ⬜ 首次 `./gradlew pagesSite` 全量组装 + 首次 `gh workflow run pages.yml` 上线验证。
-    阻塞：需要一次提交推上默认分支之后才有意义。
+11. ✅ GitHub Pages 上线验证：`./gradlew pagesSite` 全量组装通过，`gh workflow run pages.yml`
+    （run 43680216859）构建并部署成功，`/`、`/demo/`、`/api/`、`/guide/getting-started/` 均返回 200。
 
 ### 注意事项
 
