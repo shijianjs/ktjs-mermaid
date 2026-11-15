@@ -3,6 +3,9 @@
     --page-fg: #1f2933;
     --page-bg: #ffffff;
     --page-muted: #52606d;
+    --page-border: #d9e2ec;
+    --page-accent: #2563eb;
+    --page-surface: #f5f7fa;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -10,6 +13,9 @@
         --page-fg: #e4e7eb;
         --page-bg: #111827;
         --page-muted: #9aa5b1;
+        --page-border: #374151;
+        --page-accent: #60a5fa;
+        --page-surface: #1f2937;
     }
 }
 
@@ -49,7 +55,55 @@ body {
     color: var(--page-muted);
 }
 
-/* The demo page is a plain page, so the element it wraps can be spaced with a tag selector here. */
-.page vaadin-button {
-    margin-right: 0.5rem;
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 1rem 0;
+}
+
+.presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.preset,
+.render,
+.theme {
+    font: inherit;
+    padding: 0.35rem 0.75rem;
+    border: 1px solid var(--page-border);
+    border-radius: 0.375rem;
+    background: var(--page-surface);
+    color: var(--page-fg);
+    cursor: pointer;
+}
+
+.render {
+    border-color: var(--page-accent);
+    color: var(--page-accent);
+}
+
+.editor {
+    display: block;
+    width: 100%;
+    min-height: 10rem;
+    padding: 0.75rem;
+    border: 1px solid var(--page-border);
+    border-radius: 0.5rem;
+    background: var(--page-surface);
+    color: var(--page-fg);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.9rem;
+    resize: vertical;
+}
+
+.canvas {
+    margin-top: 1rem;
+    padding: 1rem;
+    border: 1px solid var(--page-border);
+    border-radius: 0.5rem;
+    overflow-x: auto;
 }
