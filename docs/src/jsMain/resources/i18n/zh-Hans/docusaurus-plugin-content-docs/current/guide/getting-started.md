@@ -144,8 +144,8 @@ mermaid.registerLayoutLoaders(
 ## 开发
 
 ```bash
-./gradlew :docs:docusaurusStart    # 本站的开发服务器
-./gradlew :demo:jsBrowserRun       # 演示页的开发服务器
+./gradlew :docs:docusaurusStart          # 本站的开发服务器
+./gradlew :demo:jsBrowserDevelopmentRun  # 演示页的开发服务器
 ```
 
 Docusaurus 监视站点目录，改 Markdown 会自动刷新；改 Kotlin 要先跑
