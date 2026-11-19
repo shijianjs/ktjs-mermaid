@@ -1,5 +1,6 @@
 package demo.e2e
 
+import com.microsoft.playwright.Locator
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.junit.UsePlaywright
 import com.microsoft.playwright.options.WaitUntilState
@@ -8,79 +9,84 @@ import kotlin.test.assertTrue
 import org.junitpioneer.jupiter.RetryingTest
 
 /**
- * Smoke checks for the demo page: it must load the bundle, render a diagram through the wrapper,
- * react to the preset and theme controls, and produce no console errors or failed requests.
+ * Smoke checks for the demo: the shell upgrades, the navigation lists both pages, the wrapper renders
+ * a diagram, the preset / theme / editor controls work, and nothing is logged.
+ *
+ * Selectors prefer what the component itself renders (`vaadin-side-nav-item[data-route=…]`) or the
+ * data attributes the playground writes on its editor, canvas and status line, so the suite does not
+ * depend on demo class names.
  */
 @UsePlaywright(DemoOptions::class)
 class DemoPageTest {
     @RetryingTest(maxAttempts = 2)
-    fun `page renders the project heading and styles`(page: Page) {
+    fun `the shell renders title, logo and both pages`(page: Page) {
         openPage(page)
 
         assertTrue(page.title().contains("ktjs-mermaid"), "title: ${page.title()}")
-        assertEquals("ktjs-mermaid demo", page.locator("h1").textContent())
+        assertTrue(page.locator("vaadin-side-nav-item[data-route]").count() == 2, "two pages in the drawer")
+        assertTrue(page.locator("img.layout__logo").first().isVisible(), "the demo serves the project logo")
 
-        // The logo is copied in from the site's static files by the `brandAssets` task.
-        assertTrue(page.locator("img.logo").isVisible(), "the demo serves the project logo")
-
-        val display = page.locator(".page").evaluate("(node) => getComputedStyle(node).display") as String
-        assertTrue(display != "contents", "the stylesheet applies to .page (display = $display)")
+        val upgraded = page.evaluate("() => document.querySelector('ktjs-demo-layout')?.shadowRoot != null") as Boolean
+        assertTrue(upgraded, "the declared <ktjs-demo-layout> upgraded into a component")
     }
 
     @RetryingTest(maxAttempts = 2)
     fun `the wrapper renders the default diagram`(page: Page) {
-        openPage(page)
+        openPlayground(page)
 
-        val svg = page.locator(".canvas svg")
-        assertTrue(svg.isVisible(), "the canvas holds an <svg> the wrapper produced")
+        page.waitForSelector("[data-canvas] svg")
+        assertTrue(page.locator("[data-canvas] svg").first().isVisible(), "the canvas holds an <svg>")
+
+        page.waitForSelector("[data-status]:has-text('Rendered')")
         assertTrue(
-            page.locator(".status").textContent().contains("flowchart-v2"),
-            "status reports the detected diagram type: ${page.locator(".status").textContent()}",
+            (page.locator("[data-status]").textContent() ?: "").startsWith("Rendered"),
+            "the status reports the render",
         )
     }
 
     @RetryingTest(maxAttempts = 2)
     fun `a preset swaps the source and the rendered diagram`(page: Page) {
-        openPage(page)
+        openPlayground(page)
 
-        page.getByText("时序图", com.microsoft.playwright.Page.GetByTextOptions().setExact(true)).click()
-        page.waitForSelector(".canvas svg")
+        button(page, "Sequence").click()
+        page.waitForSelector("[data-canvas] svg")
 
-        assertTrue(
-            page.locator(".editor").inputValue().contains("sequenceDiagram"),
-            "the preset fills the editor",
-        )
-        assertTrue(
-            page.locator(".status").textContent().contains("sequence"),
-            "status follows the new diagram type: ${page.locator(".status").textContent()}",
-        )
+        val value = page.locator("[data-editor]").inputValue()
+        assertTrue(value.contains("sequenceDiagram"), "the preset fills the editor: $value")
     }
 
     @RetryingTest(maxAttempts = 2)
     fun `an invalid source is reported instead of rendered`(page: Page) {
-        openPage(page)
+        openPlayground(page)
 
-        page.locator(".editor").fill("graph TD; A-->[")
-        page.getByText("渲染", com.microsoft.playwright.Page.GetByTextOptions().setExact(true)).click()
-        page.waitForFunction("() => document.querySelector('.status').textContent.startsWith('语法错误')")
-
-        assertTrue(
-            page.locator(".status").textContent().startsWith("语法错误"),
-            "invalid text is reported as a syntax error",
-        )
+        page.locator("[data-editor]").fill("graph TD; A-->[")
+        button(page, "Render").click()
+        page.waitForSelector("[data-status]:has-text('Syntax error')")
     }
 
     @RetryingTest(maxAttempts = 2)
     fun `the theme selector re-renders the diagram`(page: Page) {
-        openPage(page)
+        openPlayground(page)
 
-        page.locator(".theme").selectOption("dark")
-        page.waitForFunction("() => document.querySelector('.status').textContent.startsWith('已渲染')")
+        val select = page.locator("ktjs-demo-page select").first()
+        select.selectOption("dark")
+        page.waitForSelector("[data-canvas] svg")
 
-        assertTrue(
-            page.locator(".canvas svg").isVisible(),
-            "the diagram is rendered again after the theme change",
-        )
+        assertTrue(select.inputValue() == "dark", "the picker holds the chosen theme")
+        assertTrue(page.locator("[data-canvas] svg").first().isVisible(), "the diagram survives the re-render")
+    }
+
+    @RetryingTest(maxAttempts = 2)
+    fun `the language menu swaps the page copy`(page: Page) {
+        openPlayground(page)
+
+        assertEquals("Playground", page.locator("ktjs-demo-page h1").first().textContent())
+
+        page.locator("[data-menu='lang']").first().click()
+        page.locator("[data-action='lang:zh-Hans']").first().click()
+
+        assertEquals("演练场", page.locator("ktjs-demo-page h1").first().textContent())
+        assertEquals("zh-Hans", page.locator("html").getAttribute("lang"))
     }
 
     @RetryingTest(maxAttempts = 2)
@@ -94,13 +100,20 @@ class DemoPageTest {
             failedRequests += "${request.url()} ${request.failure()}"
         }
 
-        openPage(page)
+        openPlayground(page)
 
         assertTrue(consoleErrors.isEmpty(), "console errors: $consoleErrors")
         assertTrue(failedRequests.isEmpty(), "failed requests: $failedRequests")
     }
 
+    private fun button(page: Page, label: String): Locator =
+        page.locator("vaadin-button").filter(Locator.FilterOptions().setHasText(label)).first()
+
     private fun openPage(page: Page) {
         page.navigate("/", Page.NavigateOptions().setWaitUntil(WaitUntilState.NETWORKIDLE))
+    }
+
+    private fun openPlayground(page: Page) {
+        page.navigate("/#/playground", Page.NavigateOptions().setWaitUntil(WaitUntilState.NETWORKIDLE))
     }
 }

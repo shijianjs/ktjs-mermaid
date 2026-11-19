@@ -318,6 +318,18 @@ ORG_GRADLE_PROJECT_signingInMemoryKeyPassword=... \
 ## 演示页面与 GitHub Pages
 
 - `demo` 只消费公共 API，不发布、不进 Dokka。UI 代码遵守下面的「UI 编程约定」。
+- **页面外壳来自 `ktjs-demo-kit`（`ktjs-dom-kit` 仓库的模块）**，demo 自己只留内容：`index.html` 里只声明一个
+  `<ktjs-demo-layout id="demo">`，`demo/Main.kt` 定义标签并挂上 `LayoutConfig`（菜单、语言、主题、文案、
+  版本与三个链接、logo）。菜单在 `demo/SiteMenu.kt`（`Group` + `Entry`），外壳文案在 `demo/SiteTexts.kt`
+  （每语言一个 `SiteTexts`），页面在 `demo/page/<分组>/`，每页一个 `Translations` + `Binder`：切语言只重写
+  文本，不重建节点。
+- **demo 的 JS 编译目标必须是 ES2015**：外壳是自定义元素，ES5 下 Kotlin 生成
+  `function X() { HTMLElement.call(this) }`，而 DOM 构造函数只能 `new`，标签永远不升级——页面白屏，
+  console 里是 `Failed to construct 'HTMLElement'`。
+- **`mermaid.render` 的 container 必须在 light DOM**：它用 `document.getElementById` 找自己临时插进去的
+  容器，而 shadow root 里的节点 document 看不到。demo 页面整个在外壳的 shadow 树里，所以渲染时传入一个
+  挂在 `document.body` 上、`left: -10000px` 的 staging 元素，拿到 `svg` 字符串后再写进画布；直接传画布会
+  得到 `Cannot read properties of null (reading 'getAttribute')`。
 - 根 `package.json` 的 `browserslist` 是构建必需项：Babel 从生成的站点目录往上找到它才有编译目标。没有它
   `@babel/preset-env` 按 ES5 处理，`@docusaurus/theme-mermaid` 里
   `if (__DOCUSAURUS_MERMAID_LAYOUT_ELK_ENABLED__)` 这个守卫不再是死代码，webpack 会去解析那个**故意没装**
