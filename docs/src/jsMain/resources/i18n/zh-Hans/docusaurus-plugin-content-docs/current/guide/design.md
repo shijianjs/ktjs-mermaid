@@ -19,6 +19,17 @@ sidebar_position: 3
 | `config/ConfigTypes.kt` | 生成的 `MermaidConfig` 树 |
 
 划分跟着上游的声明文件走：类型待在拥有它的功能旁边，`DiagramRenderer` 不会埋在一份讲入口的文件里。
+```mermaid
+flowchart TB
+  ENTRY["Mermaid.kt<br/>入口接口、MermaidAPI、Diagram"] --> DEF["MermaidDefault.kt<br/>@JsModule(''mermaid'') 的 default 导入"]
+  ENTRY --> TYPES["MermaidTypes.kt<br/>RunOptions、RenderResult、ParseOptions、DetailedError 等"]
+  ENTRY --> DIAG["DiagramApi.kt<br/>DB、渲染器、解析器定义、d3 句柄"]
+  ENTRY --> ICONS["Icons.kt<br/>Iconify JSON + 两种图标加载器"]
+  ENTRY --> LAYOUT["Layouts.kt<br/>布局算法、渲染选项、助手"]
+  ENTRY --> CFG["config/ConfigTypes.kt<br/>生成的 MermaidConfig（36 接口、572 成员）"]
+```
+
+所以一个页面只碰一个入口对象（`mermaid`）和一份配置记录，其余按上游文件归属分组。
 
 ## 配置树是生成出来的
 

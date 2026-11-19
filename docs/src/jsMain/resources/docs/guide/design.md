@@ -21,6 +21,18 @@ being precise.
 
 The split follows the upstream declaration files: a type lives next to the feature that owns it, so
 `DiagramRenderer` is not buried in a file about the entry point.
+```mermaid
+flowchart TB
+  ENTRY["Mermaid.kt<br/>Mermaid entry, MermaidAPI, Diagram"] --> DEF["MermaidDefault.kt<br/>@JsModule(''mermaid'') default import"]
+  ENTRY --> TYPES["MermaidTypes.kt<br/>RunOptions, RenderResult, ParseOptions, DetailedError …"]
+  ENTRY --> DIAG["DiagramApi.kt<br/>DB, renderer, parser definition, d3 handles"]
+  ENTRY --> ICONS["Icons.kt<br/>Iconify JSON + the two icon loaders"]
+  ENTRY --> LAYOUT["Layouts.kt<br/>layout algorithms, render options, helpers"]
+  ENTRY --> CFG["config/ConfigTypes.kt<br/>generated MermaidConfig (36 interfaces, 572 members)"]
+```
+
+A page therefore touches one entry object (`mermaid`) and one config record; everything else is
+grouped by the upstream file it came from.
 
 ## The configuration tree is generated
 
