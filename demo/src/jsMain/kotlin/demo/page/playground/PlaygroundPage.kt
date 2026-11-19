@@ -1,12 +1,14 @@
 package demo.page.playground
 
+import io.github.shijianjs.ktjs.demo.page.DemoPage
+import io.github.shijianjs.ktjs.dom.webcomponent.defineIfMissing
+import web.components.CustomElementReference
+import web.dom.TagName
 import io.github.shijianjs.ktjs.demo.i18n.Binder
 import io.github.shijianjs.ktjs.demo.i18n.Lang
 import io.github.shijianjs.ktjs.demo.i18n.Langs
 import io.github.shijianjs.ktjs.demo.i18n.Translations
 import io.github.shijianjs.ktjs.demo.i18n.texts
-import io.github.shijianjs.ktjs.demo.nav.Page
-import io.github.shijianjs.ktjs.demo.page.newPage
 import io.github.shijianjs.ktjs.demo.page.row
 import io.github.shijianjs.ktjs.demo.page.sectionBlock
 import io.github.shijianjs.ktjs.demo.style.Palette
@@ -161,8 +163,7 @@ private val playgroundTexts: Translations<PlaygroundTexts> = texts(
  * Nodes are fields and the renderer is called in place; a language switch only rewrites the labels,
  * so the diagram already on the canvas survives it.
  */
-internal class PlaygroundPage : Page {
-    private val page = newPage()
+internal class PlaygroundPage : DemoPage() {
 
     private val texts = Binder(playgroundTexts)
 
@@ -231,7 +232,6 @@ internal class PlaygroundPage : Page {
         }
     }
 
-    override val node get() = page
 
     init {
         texts.bind(renderButton, { it.render })
@@ -249,7 +249,7 @@ internal class PlaygroundPage : Page {
             canvas,
         )
 
-        page.body.append(section.root)
+        body.append(section.root)
 
         renderButton.clickEvent.addHandler { renderNow() }
         // A native `<select>`: its value is exactly the theme name mermaid takes.
@@ -318,8 +318,22 @@ internal class PlaygroundPage : Page {
 
     override fun applyTranslation(lang: Lang) {
         current = playgroundTexts[lang]
-        page.setTitle(current.title)
-        page.setSummary(current.summary)
+        setTitle(current.title)
+        setSummary(current.summary)
         texts.apply(lang)
     }
+
+    companion object : CustomElementReference<PlaygroundPage>(PlaygroundPage::class.js) {
+        val NAME: TagName<PlaygroundPage> = TagName("mermaid-playground-page")
+
+        fun define() {
+            defineIfMissing(NAME, this)
+        }
+    }
+}
+
+/** Creates a defined `<mermaid-playground-page>`. */
+internal fun newPlaygroundPage(): PlaygroundPage {
+    PlaygroundPage.define()
+    return PlaygroundPage.NAME()
 }
