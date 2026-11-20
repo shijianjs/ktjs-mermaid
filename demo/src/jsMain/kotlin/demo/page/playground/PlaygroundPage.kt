@@ -39,104 +39,6 @@ import web.html.HTMLElement
 import web.html.HtmlSource
 import web.html.HtmlTagName
 
-/** The diagrams the playground offers: the source each preset writes into the editor. */
-private val PRESET_SOURCES: List<String> = listOf(
-    """
-        graph TD
-            A[call mermaid.render] --> B{does it parse?}
-            B -->|yes| C[insert the svg]
-            B -->|no| D[show the error]
-            C --> E[bindFunctions]
-    """.trimIndent(),
-    """
-        sequenceDiagram
-            participant K as Kotlin
-            participant M as mermaid
-            K->>M: render(id, text)
-            M-->>K: RenderResult(svg, bindFunctions)
-    """.trimIndent(),
-    """
-        classDiagram
-            class Mermaid {
-                +initialize(config)
-                +render(id, text) Promise
-                +parse(text) Promise
-            }
-            class RenderResult {
-                +svg
-                +diagramType
-            }
-            Mermaid --> RenderResult
-    """.trimIndent(),
-    """
-        stateDiagram-v2
-            [*] --> Idle
-            Idle --> Parsing: press Render
-            Parsing --> Rendered: the syntax passes
-            Parsing --> Broken: the syntax fails
-            Rendered --> [*]
-    """.trimIndent(),
-    """
-        gantt
-            title wrapper schedule
-            dateFormat YYYY-MM-DD
-            section Declarations
-            generate the config types :done, a1, 2026-11-10, 3d
-            hand-write the entry points :active, a2, after a1, 2d
-            section Verification
-            browser tests :a3, after a2, 2d
-    """.trimIndent(),
-    """
-        pie title diagram types in use
-            "flowchart" : 40
-            "sequence" : 30
-            "other" : 30
-    """.trimIndent(),
-)
-
-/** The themes the selector offers; `mermaid` validates the value itself. */
-private val THEMES: List<String> = listOf("default", "dark", "forest", "neutral", "base", "neo")
-
-private val playgroundEnglish: PlaygroundTexts = PlaygroundTexts(
-    title = "Playground",
-    summary = "One editor and one canvas: a preset fills the source, Render hands it to mermaid and " +
-        "the result lands on the canvas — the same three steps a consumer performs.",
-    editorHeading = "Source and result",
-    editorHint = "Pick a preset, edit the text, then press Render. Switching the theme re-renders " +
-        "the same source.",
-    presetLabels = listOf("Flowchart", "Sequence", "Class", "State", "Gantt", "Pie"),
-    themeLabel = "Theme",
-    render = "Render",
-    idle = "Not rendered yet",
-    parsing = "Parsing…",
-    syntaxError = "Syntax error: mermaid cannot parse this text",
-    unknownDiagram = "Unknown diagram type — check the first line",
-    renderFailed = "Render failed — see the console",
-    renderedPrefix = "Rendered: ",
-)
-
-private val playgroundChinese: PlaygroundTexts = PlaygroundTexts(
-    title = "演练场",
-    summary = "一个编辑器加一块画布：预设填入图源，点「渲染」交给 mermaid，结果画在画布上——" +
-        "就是消费方的三步。",
-    editorHeading = "图源与结果",
-    editorHint = "选一个预设、改文本、再点「渲染」。换主题会用同一段图源重新渲染。",
-    presetLabels = listOf("流程图", "时序图", "类图", "状态图", "甘特图", "饼图"),
-    themeLabel = "主题",
-    render = "渲染",
-    idle = "尚未渲染",
-    parsing = "解析中…",
-    syntaxError = "语法错误：mermaid 无法解析这段文本",
-    unknownDiagram = "无法识别的图型，请检查第一行",
-    renderFailed = "渲染失败，见控制台",
-    renderedPrefix = "已渲染：",
-)
-
-private val playgroundTexts: Translations<PlaygroundTexts> = texts(
-    Langs.EN to playgroundEnglish,
-    Langs.ZH_HANS to playgroundChinese,
-)
-
 /**
  * The playground: an editor, a preset row, a theme selector and a canvas.
  *
@@ -302,5 +204,100 @@ internal class PlaygroundPage : DemoPage() {
         texts.apply(lang)
     }
 
-    companion object : CustomElementReferenceAdapter<PlaygroundPage>(PlaygroundPage::class.js, "mermaid-playground-page")
+    companion object : CustomElementReferenceAdapter<PlaygroundPage>(PlaygroundPage::class.js, "mermaid-playground-page") {
+
+        /** The diagrams the playground offers: the source each preset writes into the editor. */
+        private val PRESET_SOURCES: List<String> = listOf(
+            """
+                graph TD
+                    A[call mermaid.render] --> B{does it parse?}
+                    B -->|yes| C[insert the svg]
+                    B -->|no| D[show the error]
+                    C --> E[bindFunctions]
+            """.trimIndent(),
+            """
+                sequenceDiagram
+                    participant K as Kotlin
+                    participant M as mermaid
+                    K->>M: render(id, text)
+                    M-->>K: RenderResult(svg, bindFunctions)
+            """.trimIndent(),
+            """
+                classDiagram
+                    class Mermaid {
+                        +initialize(config)
+                        +render(id, text) Promise
+                        +parse(text) Promise
+                    }
+                    class RenderResult {
+                        +svg
+                        +diagramType
+                    }
+                    Mermaid --> RenderResult
+            """.trimIndent(),
+            """
+                stateDiagram-v2
+                    [*] --> Idle
+                    Idle --> Parsing: press Render
+                    Parsing --> Rendered: the syntax passes
+                    Parsing --> Broken: the syntax fails
+                    Rendered --> [*]
+            """.trimIndent(),
+            """
+                gantt
+                    title wrapper schedule
+                    dateFormat YYYY-MM-DD
+                    section Declarations
+                    generate the config types :done, a1, 2026-11-10, 3d
+                    hand-write the entry points :active, a2, after a1, 2d
+                    section Verification
+                    browser tests :a3, after a2, 2d
+            """.trimIndent(),
+            """
+                pie title diagram types in use
+                    "flowchart" : 40
+                    "sequence" : 30
+                    "other" : 30
+            """.trimIndent(),
+        )
+        /** The themes the selector offers; `mermaid` validates the value itself. */
+        private val THEMES: List<String> = listOf("default", "dark", "forest", "neutral", "base", "neo")
+        private val playgroundEnglish: PlaygroundTexts = PlaygroundTexts(
+            title = "Playground",
+            summary = "One editor and one canvas: a preset fills the source, Render hands it to mermaid and " +
+                "the result lands on the canvas — the same three steps a consumer performs.",
+            editorHeading = "Source and result",
+            editorHint = "Pick a preset, edit the text, then press Render. Switching the theme re-renders " +
+                "the same source.",
+            presetLabels = listOf("Flowchart", "Sequence", "Class", "State", "Gantt", "Pie"),
+            themeLabel = "Theme",
+            render = "Render",
+            idle = "Not rendered yet",
+            parsing = "Parsing…",
+            syntaxError = "Syntax error: mermaid cannot parse this text",
+            unknownDiagram = "Unknown diagram type — check the first line",
+            renderFailed = "Render failed — see the console",
+            renderedPrefix = "Rendered: ",
+        )
+        private val playgroundChinese: PlaygroundTexts = PlaygroundTexts(
+            title = "演练场",
+            summary = "一个编辑器加一块画布：预设填入图源，点「渲染」交给 mermaid，结果画在画布上——" +
+                "就是消费方的三步。",
+            editorHeading = "图源与结果",
+            editorHint = "选一个预设、改文本、再点「渲染」。换主题会用同一段图源重新渲染。",
+            presetLabels = listOf("流程图", "时序图", "类图", "状态图", "甘特图", "饼图"),
+            themeLabel = "主题",
+            render = "渲染",
+            idle = "尚未渲染",
+            parsing = "解析中…",
+            syntaxError = "语法错误：mermaid 无法解析这段文本",
+            unknownDiagram = "无法识别的图型，请检查第一行",
+            renderFailed = "渲染失败，见控制台",
+            renderedPrefix = "已渲染：",
+        )
+        private val playgroundTexts: Translations<PlaygroundTexts> = texts(
+            Langs.EN to playgroundEnglish,
+            Langs.ZH_HANS to playgroundChinese,
+        )
+    }
 }
