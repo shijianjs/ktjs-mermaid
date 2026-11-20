@@ -23,7 +23,6 @@ import js.objects.unsafeJso
 import web.animations.requestAnimationFrame
 import web.cssom.Border
 import web.cssom.FontFamily
-import web.cssom.FontSize
 import web.cssom.LineStyle
 import web.cssom.Overflow
 import web.cssom.Padding
@@ -97,23 +96,6 @@ private val PRESET_SOURCES: List<String> = listOf(
 
 /** The themes the selector offers; `mermaid` validates the value itself. */
 private val THEMES: List<String> = listOf("default", "dark", "forest", "neutral", "base", "neo")
-
-/** Every string this page shows, in one language. */
-private class PlaygroundTexts(
-    val title: String,
-    val summary: String,
-    val editorHeading: String,
-    val editorHint: String,
-    val presetLabels: List<String>,
-    val themeLabel: String,
-    val render: String,
-    val idle: String,
-    val parsing: String,
-    val syntaxError: String,
-    val unknownDiagram: String,
-    val renderFailed: String,
-    val renderedPrefix: String,
-)
 
 private val playgroundEnglish: PlaygroundTexts = PlaygroundTexts(
     title = "Playground",
@@ -229,7 +211,6 @@ internal class PlaygroundPage : DemoPage() {
             }
         }
     }
-
 
     init {
         texts.bind(renderButton, { it.render })
