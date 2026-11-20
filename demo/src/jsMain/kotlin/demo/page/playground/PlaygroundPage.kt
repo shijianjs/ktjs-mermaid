@@ -238,7 +238,7 @@ internal class PlaygroundPage : DemoPage() {
         status.textContent = current.idle
 
         val section = sectionBlock()
-        texts.bind(section.title, { it.editorHeading })
+        texts.bind(section.heading, { it.editorHeading })
         texts.bind(section.hint, { it.editorHint })
         val themeLabel = texts.bind(HtmlTagName.label(), { it.themeLabel + ":" })
         section.body.append(
