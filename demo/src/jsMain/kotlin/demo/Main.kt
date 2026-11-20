@@ -21,7 +21,8 @@ fun main() {
     val theme = Theme()
     theme.applyStored()
 
-    DemoLayout.define()
+    // The companion registers the tag in its `init`; reading `NAME` upgrades the element the page already spells.
+    DemoLayout.NAME
     val layout = document.getElementById(ElementId("demo")) as? DemoLayout
         ?: error("index.html has no <ktjs-demo-layout id=\"demo\">")
 

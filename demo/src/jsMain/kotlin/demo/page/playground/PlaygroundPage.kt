@@ -1,20 +1,18 @@
 package demo.page.playground
 
 import io.github.shijianjs.ktjs.demo.page.DemoPage
-import io.github.shijianjs.ktjs.dom.webcomponent.defineIfMissing
-import web.components.CustomElementReference
-import web.dom.TagName
 import io.github.shijianjs.ktjs.demo.i18n.Binder
 import io.github.shijianjs.ktjs.demo.i18n.Lang
 import io.github.shijianjs.ktjs.demo.i18n.Langs
 import io.github.shijianjs.ktjs.demo.i18n.Translations
 import io.github.shijianjs.ktjs.demo.i18n.texts
-import io.github.shijianjs.ktjs.demo.page.row
-import io.github.shijianjs.ktjs.demo.page.sectionBlock
+import io.github.shijianjs.ktjs.demo.page.Blocks.row
+import io.github.shijianjs.ktjs.demo.page.SectionBlock
 import io.github.shijianjs.ktjs.demo.style.Palette
 import io.github.shijianjs.ktjs.dom.element.inlineStyle
 import io.github.shijianjs.ktjs.dom.element.invoke
 import io.github.shijianjs.ktjs.dom.element.unaryPlus
+import io.github.shijianjs.ktjs.dom.webcomponent.CustomElementReferenceAdapter
 import io.github.shijianjs.ktjs.mermaid.mermaid
 import io.github.shijianjs.ktjs.mermaid.parseOrNull
 import io.github.shijianjs.ktjs.mermaid.config.MermaidConfig
@@ -237,7 +235,7 @@ internal class PlaygroundPage : DemoPage() {
         texts.bind(renderButton, { it.render })
         status.textContent = current.idle
 
-        val section = sectionBlock()
+        val section = SectionBlock.NAME { show() }
         texts.bind(section.heading, { it.editorHeading })
         texts.bind(section.hint, { it.editorHint })
         val themeLabel = texts.bind(HtmlTagName.label(), { it.themeLabel + ":" })
@@ -323,17 +321,5 @@ internal class PlaygroundPage : DemoPage() {
         texts.apply(lang)
     }
 
-    companion object : CustomElementReference<PlaygroundPage>(PlaygroundPage::class.js) {
-        val NAME: TagName<PlaygroundPage> = TagName("mermaid-playground-page")
-
-        fun define() {
-            defineIfMissing(NAME, this)
-        }
-    }
-}
-
-/** Creates a defined `<mermaid-playground-page>`. */
-internal fun newPlaygroundPage(): PlaygroundPage {
-    PlaygroundPage.define()
-    return PlaygroundPage.NAME()
+    companion object : CustomElementReferenceAdapter<PlaygroundPage>(PlaygroundPage::class.js, "mermaid-playground-page")
 }
