@@ -68,7 +68,7 @@ class DemoPageTest {
     fun `the theme selector re-renders the diagram`(page: Page) {
         openPlayground(page)
 
-        val select = page.locator("ktjs-demo-page select").first()
+        val select = page.locator("mermaid-playground-page select").first()
         select.selectOption("dark")
         page.waitForSelector("[data-canvas] svg")
 
@@ -80,12 +80,12 @@ class DemoPageTest {
     fun `the language menu swaps the page copy`(page: Page) {
         openPlayground(page)
 
-        assertEquals("Playground", page.locator("ktjs-demo-page h1").first().textContent())
+        assertEquals("Playground", page.locator("mermaid-playground-page h1").first().textContent())
 
         page.locator("[data-menu='lang']").first().click()
         page.locator("[data-action='lang:zh-Hans']").first().click()
 
-        assertEquals("演练场", page.locator("ktjs-demo-page h1").first().textContent())
+        assertEquals("演练场", page.locator("mermaid-playground-page h1").first().textContent())
         assertEquals("zh-Hans", page.locator("html").getAttribute("lang"))
     }
 
