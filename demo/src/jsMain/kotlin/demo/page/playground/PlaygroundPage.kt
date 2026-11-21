@@ -12,7 +12,6 @@ import io.github.shijianjs.ktjs.demo.style.Palette
 import io.github.shijianjs.ktjs.dom.element.inlineStyle
 import io.github.shijianjs.ktjs.dom.element.invoke
 import io.github.shijianjs.ktjs.dom.element.unaryPlus
-import io.github.shijianjs.ktjs.dom.webcomponent.CustomElementReferenceAdapter
 import io.github.shijianjs.ktjs.mermaid.mermaid
 import io.github.shijianjs.ktjs.mermaid.parseOrNull
 import io.github.shijianjs.ktjs.mermaid.config.MermaidConfig
@@ -204,7 +203,7 @@ internal class PlaygroundPage : DemoPage() {
         texts.apply(lang)
     }
 
-    companion object : CustomElementReferenceAdapter<PlaygroundPage>(PlaygroundPage::class.js, "mermaid-playground-page") {
+    companion object : PlaygroundPageDefaultReference() {
 
         /** The diagrams the playground offers: the source each preset writes into the editor. */
         private val PRESET_SOURCES: List<String> = listOf(
