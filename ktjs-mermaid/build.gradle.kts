@@ -60,7 +60,7 @@ kotlin {
             // `js.objects.unsafeJso` / `js.objects.Record` live, the way callers build a
             // `MermaidConfig` object literal.
             api("org.jetbrains.kotlin-wrappers:kotlin-browser:2026.11.2")
-            api("org.jetbrains.kotlin-wrappers:kotlin-js:2026.11.1")
+            api("org.jetbrains.kotlin-wrappers:kotlin-js:2026.11.2")
         }
         jsTest.dependencies {
             implementation(kotlin("test"))
